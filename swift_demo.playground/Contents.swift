@@ -476,7 +476,9 @@ if player.tracker.advenceToLevel(7) {
     print("关卡7暂时还没有解锁")
 }
 
-//下标 Subscript
+/**
+ *  下标 Subscript
+ */
 struct TimesTable {
     let multiplier: Int
     subscript(index: Int) -> Int {
@@ -520,7 +522,84 @@ matrix[0, 1] = 1.5
 matrix[1, 0] = 3.2
 
 
+/**
+ *  继承 Inheritance
+ */
 
+//使用 final 关键字可以防止重写和继承
+
+//定义一个基类
+class Vehicle {
+    var currentSpeed: Double = 0.0
+    var description: String {
+        return "traveling at \(currentSpeed) miles per hour"
+    }
+    
+    func makeNoise() {
+        
+    }
+}
+
+var someVehicle = Vehicle()
+print("Vehicle: \(someVehicle.description)")
+
+//子类生成 subclassing
+class Bicycle: Vehicle {
+    var hasBasket = false
+}
+
+var bicycle = Bicycle()
+bicycle.hasBasket = true
+bicycle.currentSpeed = 1.0
+
+print("Bicycle: \(bicycle.description)")
+
+class Tandem: Bicycle {
+    var currentNumberOfPassengers = 0
+}
+
+let tandem = Tandem()
+tandem.currentSpeed = 20.0
+tandem.currentNumberOfPassengers = 2
+tandem.hasBasket = true
+
+print("Tandem: \(tandem.description))")
+
+//重写方法 Override Method
+class Train: Vehicle {
+    override func makeNoise() {
+        print("Woooooo")
+    }
+}
+
+let train = Train()
+train.makeNoise()
+
+//重写属性 Override Property
+class Car: Vehicle {
+    var gear = 1
+    override var description: String {
+        return super.description + "in gear \(gear)"
+    }
+}
+
+var car = Car()
+car.currentSpeed = 30.0
+car.gear = 2
+car.description
+
+//重写属性观察器
+class AutomaticCar: Car {
+    override var currentSpeed: Double {
+        didSet {
+            gear = Int(currentSpeed / 10) + 1
+        }
+    }
+}
+
+var automaticCar = AutomaticCar()
+automaticCar.currentSpeed = 29.0
+print("Automatic: \(automaticCar.description)")
 
 
 
