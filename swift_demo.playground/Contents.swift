@@ -602,6 +602,59 @@ automaticCar.currentSpeed = 29.0
 print("Automatic: \(automaticCar.description)")
 
 
+/**
+ *  构造过程 Initialization
+ */
+struct Color {
+    let red, green, blue: Double
+    
+    init(red: Double, green: Double, blue: Double) {
+        self.red = red
+        self.green = green
+        self.blue = blue
+    }
+    init(white: Double) {
+        red = white
+        green = white
+        blue = white
+    }
+}
+
+let magenta = Color(red: 1.0, green: 0.0, blue: 1.0)
+let halfGray = Color(white: 0.5)
+
+//可选属性类型,可以不在类或结构体初始化的时候赋值，自动初始化为nil
+class SurveyQuestion {
+    var text: String
+    var response: String?
+    
+    init(text: String) {
+        self.text = text
+    }
+}
+
+let cheeseQuestion = SurveyQuestion(text: "Do you like cheese?")
+cheeseQuestion.response
+
+//默认构造器: 所有属性都有默认值，同时没有自定义的构造器
+class ShoppingListItem {
+    var name: String?
+    var quantity = 1
+    var purchased = false
+}
+
+var item = ShoppingListItem()
+
+//结构体的逐一成员构造器
+struct Rectangle {
+    var width = 0.0, height = 0.0
+}
+
+let twoBytwo = Rectangle(width: 2.0, height: 2.0)
+
+
+
+
 
 
 
