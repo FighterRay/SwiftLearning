@@ -602,9 +602,11 @@ automaticCar.currentSpeed = 29.0
 print("Automatic: \(automaticCar.description)")
 
 
+
 /**
  *  构造过程 Initialization
  */
+
 struct Color {
     let red, green, blue: Double
     
@@ -637,32 +639,266 @@ let cheeseQuestion = SurveyQuestion(text: "Do you like cheese?")
 cheeseQuestion.response
 
 //默认构造器: 所有属性都有默认值，同时没有自定义的构造器
-class ShoppingListItem {
+class ListItem {
     var name: String?
     var quantity = 1
     var purchased = false
 }
 
-var item = ShoppingListItem()
+var item = ListItem()
 
-//结构体的逐一成员构造器
+//结构体的逐一成员构造器 memberwise initializers for structure type
 struct Rectangle {
     var width = 0.0, height = 0.0
 }
 
 let twoBytwo = Rectangle(width: 2.0, height: 2.0)
 
+//值类型(结构体和枚举类型)的构造器代理
 
+struct Rect1 {
+    var origin = Point()
+    var size = Size()
+    
+    init() {}
+    init(origin: Point, size: Size) {
+        self.origin = origin
+        self.size = size
+    }
+    init(center: Point, size:Size) {
+        let originX = center.x - (size.width / 2)
+        let originY = center.y - (size.height / 2)
+        self.init(origin: Point(x: originX, y: originY), size: size)
+    }
+}
 
+let basicRect = Rect1()
+let originRect = Rect1(center: Point(x: 4.0, y: 4.0), size: Size(width: 5.0, height: 5.0))
+let centerRect = Rect1(origin: Point(x: 4.0, y:4.0), size: Size(width: 3.0, height: 3.0))
 
+//类的继承和构造过程
+//指定构造器 designated initializer 和 便利构造器 convenience initiallizer
 
+//基类Food
+class Food {
+    var name: String
 
+    init(name: String) {
+        self.name = name
+    }
+    convenience init() {
+        self.init(name: "[Unnamed]")
+    }
+}
 
+var food = Food(name: "Bacon")
+food.name
+let mysteryMeat = Food()
+mysteryMeat.name
 
+//RecipeIngredient类构建了食谱中的一味调味剂
+class RecipeIngredient: Food {
+    var quantity: Int
+    var description: String {
+        return "Name is: \(name), quantity is: \(quantity)"
+    }
+    
+    init(name: String, quantity: Int) {
+        self.quantity = quantity
+        super.init(name: name)
+    }
+    override convenience init(name: String) {
+        self.init(name: name, quantity: 1)
+    }
+}
 
+let oneMysteryItem = RecipeIngredient()
+oneMysteryItem.description
+let oneBacon = RecipeIngredient(name: "Bacon")
+oneBacon.description
+let sixEggs = RecipeIngredient(name: "Eggs", quantity: 6)
+sixEggs.description
 
+class ShoppingListItem: RecipeIngredient {
+    var purchased = false
+    override var description: String {
+        var output = "\(quantity) x \(name)"
+        output += purchased ? " ✔" : " ✘"
+        return output
+    }
+}
 
+var breakfastList = [
+    ShoppingListItem(),
+    ShoppingListItem(name: "Bacon"),
+    ShoppingListItem(name: "Eggs", quantity: 6)
+]
+breakfastList[0].name = "Orange juice"
+breakfastList[0].purchased = true
+for item in breakfastList {
+    print(item.description)
+}
 
+//可失败构造器
+
+//值类型（也就是结构体或枚举）的可失败构造器，可以在构造过程中的任意时间点触发构造失败。
+struct Animal {
+    let species: String
+    init?(species: String) {
+        //self.species = species
+        if species.isEmpty {
+            return nil
+        }
+        self.species = species
+    }
+}
+
+if let giraffe = Animal(species: "Giraffe") {
+    print("An Animal was initialized with a species of \(giraffe.species)")
+}
+
+//枚举类型的可失败构造器
+enum TemperatureUnit {
+    case Kelvin, Celsius, Fahrenhiet
+    init?(symbol: String) {
+        switch symbol {
+        case "K":
+            self = .Kelvin
+        case "F":
+            self = .Fahrenhiet
+        case "C":
+            self = .Celsius
+        default:
+            return nil
+        }
+    }
+}
+
+if let fahrenheitUnit = TemperatureUnit(symbol: "F") {
+    print("This is defined temperature unit, so initialization succeeded")
+}
+
+//带原始值的枚举类型的可失败构造器
+//带原始值的枚举类型会自带一个可失败的构造器 init？(rawValue:) ,rawValue的类型和枚举值的原始类型一致
+enum TemperatureUnit1: Character {
+    case Kelvin = "K",Celsius = "C", Fahrenheit = "F"
+}
+
+if let fahrenheitUnit = TemperatureUnit1(rawValue: "F") {
+    print("This is defined temperature unit, so initializetion succeded")
+}
+
+//类的可失败构造器
+//对类而言，可失败构造器只能在类引入的所有存储型属性被初始化后，以及构造器代理调用完成后，才能触发构造失败
+class Product {
+    var name: String! //使用隐式解包可选类型
+    
+    init?(name: String) {
+        if name.isEmpty {
+            return nil
+        }
+        self.name = name //若name为常量，则这句代码必须放在if语句之前
+    }
+}
+
+if let bowTie = Product(name: "bow tie") {
+    print("The product's name is \(bowTie.name)")
+}
+
+//构造失败的传递
+class CartItem: Product {
+    let quantity: Int!
+    
+    init?(name: String, quantity: Int) {
+        self.quantity = quantity
+        super.init(name: name)
+        if quantity < 1 {
+            return nil
+        }
+    }
+}
+
+if let twoSocks = CartItem(name: "sock", quantity: 2) {
+    print("Item: \(twoSocks.name), quantity: \(twoSocks.quantity)")
+}
+
+//重写一个可失败构造器
+//可以用非可失败构造器重写可失败构造器，但反过来却不行
+class Document {
+    var name: String?
+    
+    init() {}
+    init?(name: String) {
+        self.name = name
+        if name.isEmpty {
+            return nil
+        }
+    }
+}
+
+class AutomaticallyNamedDocument: Document {
+    override init() {
+        super.init()
+        self.name = "[Untitled]"
+    }
+    override init?(name: String) {
+        super.init()
+        if name.isEmpty {
+            self.name = "[Untitle]"
+        } else {
+            self.name = name
+        }
+    }
+}
+
+//可以在子类的非可失败构造器中使用强制解包来调用父类的可失败构造器
+//如果在调用父类的可失败构造器init?(name:)时传入的是空字符串，那么强制解包操作会引发运行时错误
+class UntitledDocument: Document {
+    override init() {
+        super.init(name: "[Untitle]")!
+    }
+}
+
+//可以在init?中代理到init!，反之亦然
+
+//必要构造器： 所有该类的子类都必须实现该构造器
+//如果子类继承的构造器能满足必要构造器的要求，则无须在子类中显式提供必要构造器的实现
+class SomeClass {
+    required init() {
+        // 构造器的实现代码
+    }
+}
+
+//在重写父类中必要的指定构造器时，不需要添加override修饰符
+class SomeSubclass: SomeClass {
+    required init() {
+        // 构造器的实现代码
+    }
+}
+
+//通过闭包或函数设置属性的默认值
+//例子：西洋跳棋游戏
+struct Checkerboard {
+    let boardColor: [Bool] = {
+        var temporaryBoard = [Bool]()
+        var isBlack = false
+        for i in 1...10 {
+            for j in 1...10 {
+                temporaryBoard.append(isBlack)
+                isBlack = !isBlack
+            }
+            isBlack = !isBlack
+        }
+        return temporaryBoard
+    }()
+    
+    func squareIsBlackAtRow(row: Int, column: Int) -> Bool {
+        return boardColor[(row * 10) + column]
+    }
+}
+
+let board = Checkerboard()
+board.squareIsBlackAtRow(0, column: 1)
 
 
 
