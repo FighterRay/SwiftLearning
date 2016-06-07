@@ -901,11 +901,50 @@ let board = Checkerboard()
 board.squareIsBlackAtRow(0, column: 1)
 
 
+/**
+ *  析构过程 Deinitialization (只适用于class type)
+ */
+//析构器是在实例释放发生前被自动调用。不能主动调用析构器
+//析构器实践
+class Bank {
+    static var coinsInBank = 10_000
+    
+    static func vendCoins(numberOfCoinsToVend: Int) -> Int {
+        let result = min(numberOfCoinsToVend, coinsInBank)
+        coinsInBank -= result
+        return result
+    }
+    static func receiveCoins(coins: Int) {
+        coinsInBank += coins
+    }
+}
 
+class BankPlayer {
+    var coinsInPurse: Int
+    
+    init(coins: Int) {
+        coinsInPurse = Bank.vendCoins(coins)
+    }
+    func winCoins(coins: Int) {
+        coinsInPurse += Bank.vendCoins(coins)
+    }
+    deinit {
+        Bank.receiveCoins(coinsInPurse)
+    }
+}
 
+//因为玩家可以随时离开游戏，设置为隐式解包可选类型，使可以追踪玩家当前是否在游戏中
+var bankPlayer: BankPlayer? = BankPlayer(coins: 100)
+print("A new player has joined the game  with \(bankPlayer!.coinsInPurse)")
+print("There ara now \(Bank.coinsInBank) coins left in the Bank")
 
+bankPlayer!.winCoins(2_000)
+print("BankPlayer won 2000 coins & now has \(bankPlayer!.coinsInPurse) coins")
+print("The Bank now only has \(Bank.coinsInBank) coins left")
 
-
+//玩家离开了游戏,该实例的析构器被自动调用,玩家的硬币被返还给银行
+bankPlayer = nil
+print("BankPlayer has left the game, the bank now has \(Bank.coinsInBank) coins")
 
 
 
