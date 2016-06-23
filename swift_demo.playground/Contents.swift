@@ -1208,6 +1208,98 @@ if let beginsWithThe =
 }
 
 
+/**
+ *  错误处理 Error Handing
+ */
+
+//表示在一个游戏中操作自动贩卖机时可能会出现的错误状态
+enum VendingMachineError: ErrorType {
+    case InvalidSelection   //选择无效
+    case InsufficientFunds(coinsNeeds: Int) //金额不足
+    case OutOfStock     //缺货
+}
+
+throw VendingMachineError.InsufficientFunds(coinsNeeds: 5)
+
+//用throwing函数传递错误
+
+struct Item {
+    var price: Int
+    var count: Int
+}
+
+class VendingMachine {
+    var inventory = [
+        "Candy Bar": Item(price: 12, count: 7),
+        "Chips": Item(price: 10, count: 4),
+        "Pretzels": Item(price: 7, count: 11)
+    ]
+    
+    var coinsDeposited = 0
+    
+    func dispenseSnack(snack: String) {
+        print("Dispensing \(snack)");
+    }
+    
+    func vend(itemNamed name: String) throws {
+        guard var item = inventory[name] else {
+            throw VendingMachineError.InvalidSelection
+        }
+        
+        guard item.count > 0 else {
+            throw VendingMachineError.OutOfStock
+        }
+        
+        guard item.price <= coinsDeposited else {
+            throw VendingMachineError.InsufficientFunds(coinsNeeds: item.price - coinsDeposited)
+        }
+        
+        coinsDeposited -= item.price
+        item.count -= 1
+        inventory[name] = item
+        dispenseSnack(name)
+    }
+}
+
+let favoriteSnack = [
+    "Alice": "Chips",
+    "Bob": "Licorice",
+    "Eve": "Pretzles"
+]
+
+func buyFavoriteSnack(person: String, vendingMachine: VendingMachine) throws {
+    let snackName = favoriteSnack[person] ?? "Candy Bar"
+    try vendingMachine.vend(itemNamed: snackName)
+}
+
+//用Do-Catch处理错误
+var vendingMachine = VendingMachine()
+vendingMachine.coinsDeposited = 8
+do {
+    try buyFavoriteSnack("Alice", vendingMachine: vendingMachine)
+} catch VendingMachineError.InvalidSelection {
+    print("Invalid Selection.")
+} catch VendingMachineError.OutOfStock {
+    print("Out Of Stock")
+} catch VendingMachineError.InsufficientFunds(let coinsNeeded) {
+    print("Insufficient funds. Please insert an additional \(coinsNeeded)")
+}
+
+//将错误转换成可选值, 下面的x, y等价
+func someThrowingFunction() throws -> Int {
+    return 1
+}
+
+let x = try? someThrowingFunction()
+
+let y: Int?
+do {
+    y = try someThrowingFunction()
+} catch {
+    y = nil
+}
+
+
 
 
 
