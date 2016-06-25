@@ -1208,96 +1208,212 @@ if let beginsWithThe =
 }
 
 
+///**
+// *  错误处理 Error Handing
+// */
+//
+////表示在一个游戏中操作自动贩卖机时可能会出现的错误状态
+//enum VendingMachineError: ErrorType {
+//    case InvalidSelection   //选择无效
+//    case InsufficientFunds(coinsNeeds: Int) //金额不足
+//    case OutOfStock     //缺货
+//}
+//
+//throw VendingMachineError.InsufficientFunds(coinsNeeds: 5)
+//
+////用throwing函数传递错误
+//
+//struct Item {
+//    var price: Int
+//    var count: Int
+//}
+//
+//class VendingMachine {
+//    var inventory = [
+//        "Candy Bar": Item(price: 12, count: 7),
+//        "Chips": Item(price: 10, count: 4),
+//        "Pretzels": Item(price: 7, count: 11)
+//    ]
+//    
+//    var coinsDeposited = 100
+//    
+//    func dispenseSnack(snack: String) {
+//        print("Dispensing \(snack)");
+//    }
+//    
+//    func vend(itemNamed name: String) throws {
+//        guard var item = inventory[name] else {
+//            throw VendingMachineError.InvalidSelection
+//        }
+//        
+//        guard item.count > 0 else {
+//            throw VendingMachineError.OutOfStock
+//        }
+//        
+//        guard item.price <= coinsDeposited else {
+//            throw VendingMachineError.InsufficientFunds(coinsNeeds: item.price - coinsDeposited)
+//        }
+//        
+//        coinsDeposited -= item.price
+//        item.count -= 1
+//        inventory[name] = item
+//        dispenseSnack(name)
+//    }
+//}
+//
+//let favoriteSnack = [
+//    "Alice": "Chips",
+//    "Bob": "Licorice",
+//    "Eve": "Pretzles"
+//]
+//
+//func buyFavoriteSnack(person: String, vendingMachine: VendingMachine) throws {
+//    let snackName = favoriteSnack[person] ?? "Candy Bar"
+//    try vendingMachine.vend(itemNamed: snackName)
+//}
+//
+////用Do-Catch处理错误
+//var vendingMachine = VendingMachine()
+//vendingMachine.coinsDeposited = 8
+//do {
+//    try buyFavoriteSnack("Alice", vendingMachine: vendingMachine)
+//} catch VendingMachineError.InvalidSelection {
+//    print("Invalid Selection.")
+//} catch VendingMachineError.OutOfStock {
+//    print("Out Of Stock")
+//} catch VendingMachineError.InsufficientFunds(let coinsNeeded) {
+//    print("Insufficient funds. Please insert an additional \(coinsNeeded)")
+//}
+//
+////将错误转换成可选值, 下面的x, y等价
+//func someThrowingFunction() throws -> Int {
+//    return 1
+//}
+//
+//let x = try? someThrowingFunction()
+//
+//let y: Int?
+//do {
+//    y = try someThrowingFunction()
+//} catch {
+//    y = nil
+//}
+
+
 /**
- *  错误处理 Error Handing
+ *  类型转换 Type Casting
  */
-
-//表示在一个游戏中操作自动贩卖机时可能会出现的错误状态
-enum VendingMachineError: ErrorType {
-    case InvalidSelection   //选择无效
-    case InsufficientFunds(coinsNeeds: Int) //金额不足
-    case OutOfStock     //缺货
-}
-
-throw VendingMachineError.InsufficientFunds(coinsNeeds: 5)
-
-//用throwing函数传递错误
-
-struct Item {
-    var price: Int
-    var count: Int
-}
-
-class VendingMachine {
-    var inventory = [
-        "Candy Bar": Item(price: 12, count: 7),
-        "Chips": Item(price: 10, count: 4),
-        "Pretzels": Item(price: 7, count: 11)
-    ]
-    
-    var coinsDeposited = 0
-    
-    func dispenseSnack(snack: String) {
-        print("Dispensing \(snack)");
-    }
-    
-    func vend(itemNamed name: String) throws {
-        guard var item = inventory[name] else {
-            throw VendingMachineError.InvalidSelection
-        }
-        
-        guard item.count > 0 else {
-            throw VendingMachineError.OutOfStock
-        }
-        
-        guard item.price <= coinsDeposited else {
-            throw VendingMachineError.InsufficientFunds(coinsNeeds: item.price - coinsDeposited)
-        }
-        
-        coinsDeposited -= item.price
-        item.count -= 1
-        inventory[name] = item
-        dispenseSnack(name)
+//定义一个类层次作为例子
+class MediaItem {
+    var name: String
+    init(name: String) {
+        self.name = name
     }
 }
 
-let favoriteSnack = [
-    "Alice": "Chips",
-    "Bob": "Licorice",
-    "Eve": "Pretzles"
+class Movie: MediaItem {
+    var director: String
+    init(name: String, director: String) {
+        self.director = director
+        super.init(name: name)
+    }
+}
+
+class Song: MediaItem {
+    var artist: String
+    init(name: String, artist: String) {
+        self.artist = artist
+        super.init(name: name)
+    }
+}
+
+//数组 library 的类型被自动判断为[MediaItem]
+let library = [
+    Movie(name: "Casablanca", director: "Michael Curtiz"),
+    Song(name: "Blue Suede Shoes", artist: "Elvis Presley"),
+    Movie(name: "Citizen Kane", director: "Orson Welles"),
+    Song(name: "The One And Only", artist: "Chesney Hawkes"),
+    Song(name: "Never Gonna Give You Up", artist: "Rick Astley")
 ]
 
-func buyFavoriteSnack(person: String, vendingMachine: VendingMachine) throws {
-    let snackName = favoriteSnack[person] ?? "Candy Bar"
-    try vendingMachine.vend(itemNamed: snackName)
+//检查类型
+var movieCount = 0
+var songCount = 0
+
+for item in library {
+    if item is Movie {
+        movieCount += 1
+    } else if item is Song {
+        songCount += 1
+    }
 }
 
-//用Do-Catch处理错误
-var vendingMachine = VendingMachine()
-vendingMachine.coinsDeposited = 8
-do {
-    try buyFavoriteSnack("Alice", vendingMachine: vendingMachine)
-} catch VendingMachineError.InvalidSelection {
-    print("Invalid Selection.")
-} catch VendingMachineError.OutOfStock {
-    print("Out Of Stock")
-} catch VendingMachineError.InsufficientFunds(let coinsNeeded) {
-    print("Insufficient funds. Please insert an additional \(coinsNeeded)")
+print("Media library contains \(movieCount) movies and \(songCount) songs")
+
+//向下转型 Downcasting
+for item in library {
+    if let movie = item as? Movie {
+        print("Movie: '\(movie.name)', dir. \(movie.director)")
+    } else if let song = item as? Song {
+        print("Song: '\(song.name)', by \(song.artist)")
+    }
 }
 
-//将错误转换成可选值, 下面的x, y等价
-func someThrowingFunction() throws -> Int {
-    return 1
+//Any 和 AnyObject 的类型转换
+let someObjects: [AnyObject] = [
+    Movie(name: "2001: A Space Odyssey", director: "Stanley Kubrick"),
+    Movie(name: "Moon", director: "Duncan Jones"),
+    Movie(name: "Alien", director: "Ridley Scott")
+]
+
+for movie in someObjects as! [Movie] {
+    print("Movie: '\(movie.name)', dir. \(movie.director)")
 }
 
-let x = try? someThrowingFunction()
+var things = [Any]()
 
-let y: Int?
-do {
-    y = try someThrowingFunction()
-} catch {
-    y = nil
+things.append(0)
+things.append(0.0)
+things.append(42)
+things.append(3.14159)
+things.append("hello")
+//things.append((3.0, 5.0))
+things.append(Movie(name: "Ghostbusters", director: "Ivan Reitman"))
+things.append({ (name: String) -> String in "Hello, \(name)" })
+
+for thing in things {
+    switch thing {
+    case 0 as Int:
+        print("zero as an Int")
+    case 0 as Double:
+        print("zero as a Double")
+    case let someInt as Int:
+        print("an integer value of \(someInt)")
+    case let someDouble as Double where someDouble > 0:
+        print("a positive double value of \(someDouble)")
+    case is Double:
+        print("some other double value that I don't want to print")
+    case let someString as String:
+        print("a string value of \"\(someString)\"")
+    case let (x, y) as (Double, Double):
+        print("an (x, y) point at \(x), \(y)")
+    case let movie as Movie:
+        print("a movie called '\(movie.name)', dir. \(movie.director)")
+    case let stringConverter as String -> String:
+        print(stringConverter("Michael"))
+    default:
+        print("something else")
+    }
 }
+
+
+
+
+
+
+
+
+
 
 
 
