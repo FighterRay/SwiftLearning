@@ -1446,6 +1446,12 @@ struct BlackjackCard {
     }
 }
 
+let theAceOfSpades = BlackjackCard(rank: .Ace, suit: .Spades)
+theAceOfSpades.description
+
+//引用嵌套类型
+let heartsSymbol = BlackjackCard.Suit.Hearts.rawValue
+let QueenSymbol = BlackjackCard.Rank.Queen.rawValue
 
 
 
