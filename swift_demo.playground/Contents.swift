@@ -338,7 +338,6 @@ let initialSquareCenter = square.center
 square.center = Point(x: 15.0, y: 15.0)
 print("square.origin is now at (\(square.center.x),\(square.center.y))")
 
-print("\n")
 
 /**
  * 属性观察器 Property Observer
@@ -1454,11 +1453,102 @@ let heartsSymbol = BlackjackCard.Suit.Hearts.rawValue
 let QueenSymbol = BlackjackCard.Rank.Queen.rawValue
 
 
+/**
+ *  扩展 Extensions
+ */
+//扩展计算型属性
+// 扩展可以添加新的计算型属性，但是不可以添加存储型属性，也不可以为已有属性添加属性观察器
+extension Double {
+    var km: Double { return self * 1_000.0 }
+    var m : Double { return self }
+    var cm: Double { return self / 100.0 }
+    var mm: Double { return self / 1_000.0 }
+    var ft: Double { return self / 3.28084 }
+}
 
+let oneInch = 25.4.mm
+let threeFeet = 3.ft
 
+//扩展构造器
+//扩展能为类添加新的便利构造器，但是它们不能为类添加新的指定构造器或析构器
+extension Rect {
+    init(center: Point, size: Size) {
+        let originX = center.x - (size.width / 2)
+        let originY = center.y - (size.height / 2)
+        self.init(origin: Point(x: originX, y: originY), size: size)
+    }
+}
+let extensionCenterRect = Rect(center: Point(x: 4.0, y: 4.0),
+                      size: Size(width: 3.0, height: 3.0))
 
+//扩展方法
+extension Int {
+    func repetitions(task: () -> Void) {
+        for _ in 0..<self {
+            task()
+        }
+    }
+}
+//使用尾随闭包让调用更加简洁
+3.repetitions { 
+    print("Hello")
+}
 
+//为结构体和枚举类型扩展可变实例方法
+extension Int {
+    mutating func square() {
+        self = self * self
+    }
+}
+var someInt = 3
+someInt.square()
 
+//扩展下标
+extension Int {
+    //返回十进制数字从右到左数的第n个数字
+    subscript(digitIndex: Int) -> Int {
+        var mutableDigitIndex = digitIndex
+        var decimalBase = 1
+        while mutableDigitIndex > 0 {
+            decimalBase *= 10
+            mutableDigitIndex -= 1
+        }
+        return (self / decimalBase) % 10
+    }
+}
+74231[1]
+
+//扩展嵌套类型
+extension Int {
+    enum Kind {
+        case Negative, Zero, Positive
+    }
+    var kind: Kind {
+        switch self {
+        case 0:
+            return .Zero
+        case let x where x > 0:
+            return .Positive
+        default:
+            return .Negative
+        }
+    }
+}
+
+func printIntergerKinds(numbers: [Int]) {
+    for number in numbers {
+        switch number.kind {
+        case .Negative:
+            print("- ", terminator: "")
+        case .Zero:
+            print("0 ", terminator: "")
+        case .Positive:
+            print("+ ", terminator: "")
+        }
+    }
+    print("")
+}
+printIntergerKinds([3, 19, -27, 0, -6, 0, 7])
 
 
 
