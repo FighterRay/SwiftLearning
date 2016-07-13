@@ -1905,8 +1905,113 @@ let hamsters = [murrayTheHamster, morganTheHamster, mauriceTheHamster]
 hamsters.textualDesription
 
 
+/**
+ *  泛型 Generics
+ */
+func swapTwoValues<T>(inout a: T, inout _ b: T) {
+    let temporaryA = a
+    a = b
+    b = temporaryA
+}
+var someInt1 = 1
+var antherInt2 = 2
+swapTwoValues(&someInt1, &antherInt2)
+var someString = "Hello"
+var antherString = "World"
+swapTwoValues(&someString, &antherString)
 
+//关联类型 Associated Type
+protocol Container {
+    associatedtype ItemType
+    mutating func append(item: ItemType)
+    var count: Int { get }
+    subscript(i: Int) -> ItemType { get }
+}
 
+//使用泛型定义一个Stack数据结构
+struct Stack<Element>: Container {
+    var items = [Element]()
+    mutating func push(item: Element) {
+        items.append(item)
+    }
+    mutating func pop() -> Element {
+        return items.removeLast()
+    }
+    //Container协议实现
+    //typealias ItemType = Element //可以省略，类型编译器可以自行判断
+    mutating func append(item: Element) {
+        self.push(item)
+    }
+    var count: Int {
+        return items.count
+    }
+    subscript(i: Int) -> Element {
+        return items[i]
+    }
+}
+
+var stackOfStrings = Stack<String>()
+stackOfStrings.push("uno")
+stackOfStrings.push("dos")
+stackOfStrings.push("tres")
+
+stackOfStrings[2]
+
+let fromTheTop = stackOfStrings.pop()
+
+//扩展一个泛型类型
+extension Stack {
+    var topItem: Element? {
+        return items.isEmpty ? nil : items[items.count - 1]
+    }
+}
+let topItem = stackOfStrings.topItem
+
+//类型约束 Type Constraints
+func findIndex<T: Equatable> (array: [T], _ valueToFind: T) -> Int? {
+    for (index, value) in array.enumerate() {
+        if value == valueToFind {
+            return index
+        }
+    }
+    return nil
+}
+
+let doubleIndex = findIndex([3.123, 534.32, 432.3], 3.5)
+let stringIndex = findIndex(["Mike", "Malcolm", "Andrea"], "Andrea")
+
+//where子句 Where Clauses
+//判断两个 Container 实例是否包含相同顺序的相同元素
+func allItemsMatch<
+    C1: Container, C2: Container
+    where C1.ItemType == C2.ItemType, C1.ItemType: Equatable, C2.ItemType: Equatable>
+    (someContainer: C1, _ anotherContainer: C2) -> Bool {
+    
+    // 检查两个容器含有相同数量的元素
+    if someContainer.count != anotherContainer.count {
+        return false
+    }
+    
+    // 检查每一对元素是否相等
+    for i in 0..<someContainer.count {
+        if someContainer[i] != anotherContainer[i] {
+            return false
+        }
+    }
+    
+    // 所有元素都匹配，返回 true
+    return true
+}
+
+extension Array: Container {}
+
+var arrayOfStrings = ["uno", "dos", "tres"]
+
+if allItemsMatch(stackOfStrings, arrayOfStrings) {
+    print("All items match.")
+} else {
+    print("Not all items match.")
+}
 
 
 
