@@ -2014,5 +2014,40 @@ if allItemsMatch(stackOfStrings, arrayOfStrings) {
 }
 
 
+/**
+ *  访问控制 Access Control
+ */
+public class TrackedString {
+    private(set) var numberOfEdits = 0
+    var value: String = "" {
+        didSet {
+            numberOfEdits += 1
+        }
+    }
+}
+
+var stringToEdit = TrackedString()
+stringToEdit.value = "This string will be tracked."
+stringToEdit.value += " This edit will increment numberOfEdits."
+stringToEdit.value += " So will this one."
+stringToEdit.numberOfEdits
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
